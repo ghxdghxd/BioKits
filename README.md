@@ -1,5 +1,7 @@
 # BioKits
-## Be easy to use the bio-softwares.
+## Easyly to use the bio-softwares.
+
+## fastqc
 
 ## Oncotator
 ### 注释VCF文件，获得MAF文件
