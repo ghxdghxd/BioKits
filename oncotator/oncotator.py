@@ -5,12 +5,6 @@
 # @Email   : guojt-4451@163.com
 
 """Annotation by Oncotator.
-
-Example:
-        $ oncotator.py -i input.vcf
-                              --input-format VCF or MAFLITE
-                              --qsub n1
-
 # Input Format
 # VCF: results of VarScan2
 # MAFLITE: chr start end ref_allele alt_allele [others]
@@ -51,7 +45,7 @@ def oncotator(input_file, input_format, output_format, dbdir, node=None):
     ftmp = tempfile.NamedTemporaryFile()
     ftmp.write(b"#!/bin/bash\n")
     if node:
-        ftmp.write(b"#PBS -l nodes=1:" + node + "\n")
+        ftmp.write(b"#PBS -l nodes=1:" + encode("utf-8") + b"\n")
     ftmp.write(b"#PBS -j oe\n")
     export = b"source /etc/profile.d/set.sh\n"
     act = b"source activate oncotator\n"
@@ -79,8 +73,7 @@ def get_args3():
         print("\033[1;31m" + str(imerr) + " \033[0m")
         sys.exit()
 
-    parser = ap.ArgumentParser(usage="%(prog)s",
-                               fromfile_prefix_chars='@',
+    parser = ap.ArgumentParser(fromfile_prefix_chars='@',
                                description=__doc__,
                                formatter_class=ap.RawTextHelpFormatter)
     parser.add_argument('-v', '--version',
