@@ -4,12 +4,12 @@
 * [fastqc](fastqc)
 ## DNA alignment
 * [BWA](BWA)
-* [Sra2Bam](Sra2Bam): convert SRA formate to Bam
+* [Sra2Bam](Sra2Bam): SRA转成Bam
 ## remove duplicates
-[Picard](Picard)
+* [Picard](Picard)
 ## annotation variants
-[Oncotator](oncotator)
-[annovar](annovar)
+* [Oncotator](oncotator)
+* [annovar](annovar)
 ## signifcant mutated genes
-[mutsig](mutsig)
-[hotnet2](hotnet2): 蛋白交互作用
+* [mutsig](mutsig)
+* [hotnet2](hotnet2): 蛋白交互作用

@@ -14,7 +14,6 @@ import tempfile
 
 version = "2.1"
 
-
 def main():
     """Main function."""
     global args
