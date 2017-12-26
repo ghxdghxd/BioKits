@@ -1,5 +1,5 @@
 # BWA 比对序列
-
+```
 ./bwa.2.1.py
 
 optional arguments:
@@ -11,3 +11,4 @@ optional arguments:
 Clustered arguments:
   --qsub         run in cluster [False]
   --nodes STR    name of nodes (e.g: n1,n2,...)
+```
