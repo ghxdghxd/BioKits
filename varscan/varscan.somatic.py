@@ -24,7 +24,7 @@ def get_args3():
     try:
         import argparse as ap
     except ImportError as imerr:
-        print("\033[1;31m" + str(imerr) + " \033[0m")
+        print("\n\033[1;31m" + str(imerr) + " \033[0m")
         sys.exit()
 
     parser = ap.ArgumentParser(usage=usage,
@@ -109,9 +109,6 @@ def check_dependencies(tools):
         subp = subprocess.Popen(["which", t], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         if subp.stderr.read():
             print("\033[1;31m" + "OSError: \033[1;33m" + __file__ + " requires " + t + "\033[0m")
-            sys.exit()
-        else:
-            return(subp.stdout.read().strip())
 
 
 def varscan(bams, run=False):
@@ -119,16 +116,17 @@ def varscan(bams, run=False):
     normal_bam = bams.split()[0]
     tumor_bam = bams.split()[1]
     output_name = os.path.basename(get_same_name(normal_bam, tumor_bam))
-    cmd = "samtools mpileup "
+    cmd = ["samtools", "mpileup"]
     if args.mpileup_option:
-        cmd = cmd + args.mpileup_option
+        cmd.append(args.mpileup_option)
     if args.bed:
-        cmd = cmd + " -l " + args.bed
-    cmd = cmd + " -f " + args.ref_fa + " " + normal_bam + " " + tumor_bam + \
-                " | java -jar " + args.varscan + \
-                " somatic - " + args.output_dir + "/" + output_name + \
-                " --mpileup 1 --output-vcf 1 --min-coverage " + \
-                args.min_coverage
+        cmd.append("-l " + args.bed)
+    cmd.append("-f " + args.ref_fa)
+    cmd.append(normal_bam)
+    cmd.append(tumor_bam)
+    cmd.append("| java -jar " + args.varscan)
+    cmd.append("somatic - " + args.output_dir + "/" + output_name)
+    cmd.append("--mpileup 1 --output-vcf 1 --min-coverage " + args.min_coverage)
     if(run):
         print(cmd)
         os.system(cmd)
