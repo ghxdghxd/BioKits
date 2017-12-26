@@ -1,8 +1,8 @@
-#oncotator
-
-/share/data4/Genome/oncotator_v1_ds_Jan262014
-
-
+# oncotator
+```
+usage: oncotator.py [-h] [-v] -i file --input-format Format
+                    [--output-format Format] [--qsub node]
+```
 1 输入为VCF格式
 
 2 输入为MAFLITE格式

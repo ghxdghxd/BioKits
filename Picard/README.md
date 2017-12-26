@@ -1,4 +1,5 @@
 # Picard
+## mark duplicates
 ```
 mark_duplicates.py
 
@@ -18,5 +19,4 @@ optional arguments:
                         program [STRICT]
   --node STR            name of nodes
   -n INT                number of nodes [1]
-
 ```
