@@ -1,0 +1,9 @@
+12C.sorted.dedup.bam	12N.sorted.dedup.bam
+16C.sorted.dedup.bam	16N.sorted.dedup.bam
+17C.sorted.dedup.bam	17N.sorted.dedup.bam
+19C.sorted.dedup.bam	19N.sorted.dedup.bam
+22C.sorted.dedup.bam	22N.sorted.dedup.bam
+23C.sorted.dedup.bam	23N.sorted.dedup.bam
+24C.sorted.dedup.bam	24N.sorted.dedup.bam
+25C.sorted.dedup.bam	25N.sorted.dedup.bam
+26C.sorted.dedup.bam	26N.sorted.dedup.bam
