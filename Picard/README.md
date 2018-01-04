@@ -1,4 +1,9 @@
 # Picard
+
+## java.io.IOException: No space left on device
+```java
+java -jar picard.jar TMP_DIR=PATH_TO_TMP....
+```
 ## mark duplicates
 ```
 mark_duplicates.py

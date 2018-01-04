@@ -1,4 +1,18 @@
 # oncotator
+## Install
+### Anaconda3 python3
+```python
+conda create -n oncotator python=2.7
+source activate oncotator
+pip install numpy
+pip install pyvcf
+git clone https://github.com/broadinstitute/oncotator.git
+cd oncotator
+python setup.py install
+pip install biopython or pandas .....
+```
+
+## run oncotator
 ```
 usage: oncotator.py [-h] [-v] -i file --input-format Format
                     [--output-format Format] [--qsub node]
