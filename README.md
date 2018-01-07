@@ -1,5 +1,8 @@
 # BioKits
-> Easyly to use the bio-softwares.
+Some python-scripts to run bioSoftwares
+
+Some errors when running and the solutions
+
 ## Quality Control
 * [fastqc](fastqc)
 ## DNA alignment
