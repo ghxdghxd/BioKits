@@ -5,9 +5,9 @@ for i in `seq 1 22` X Y;
 do
     python varscan.copynumber.2.2.py \
 	-r /share/data4/Genome/hg19/hg19.chr.fa \
-	-l chr$i -i /home/jintao/varsan_CNV/ZH.txt \
+	-l chr$i -i ~/varsan_CNV/ZH.txt \
 	--min-coverage 20 \
-	-o /home/jintao/varsan_CNV/CNV2/ZH \
+	-o ~/varsan_CNV/CNV2/ZH \
 	--mpileup_option B,q1 \
 	/share/apps/VarScan/VarScan.v2.3.9.jar \
 	--qsub
@@ -16,20 +16,20 @@ done
 python varscan.copynumber.2.2.py \
 -r /share/data4/Genome/hg19/hg19.chr.fa \
 -l chr17 \
--i /home/jintao/varsan_CNV/ESCC-D1.txt \
+-i ~/varsan_CNV/ESCC-D1.txt \
 --min-coverage 20 \
--o /home/jintao/varsan_CNV/CNV2 \
+-o ~/varsan_CNV/CNV2 \
 --mpileup_option B,q1 \
 /share/apps/VarScan/VarScan.v2.3.9.jar \
 --qsub
 
-/home/jintao/samtools-0.1.18/bin/samtools mpileup -B -q1 \
+~/samtools-0.1.18/bin/samtools mpileup -B -q1 \
 -r chr17 \
 -f /share/data4/Genome/hg19/hg19.chr.fa \
 /share/data2/ESCC/SRP_PTMD/ESCC-D1N.dedup.bam \
 /share/data2/ESCC/SRP_PTMD/ESCC-D1T.dedup.bam  | java -jar \
 /share/apps/VarScan/VarScan.v2.3.9.jar copynumber - \
-/home/jintao/varsan_CNV/CNV2/ESCC-D1.chr17 \
+~/varsan_CNV/CNV2/ESCC-D1.chr17 \
 - --mpileup 1 --min-coverage 20 --min-segment-size 100
 ```
 ## 2. merge copynumber
@@ -216,9 +216,9 @@ sed 1i"barcode\tchromosome\tstart\tstop\tnum.mark\tseg.mean" segmentedFile >../J
 
 awk 'NR>1{print $2":"$3"\t"$2"\t"$3"\n"$2":"$4"\t"$2"\t"$4}' segmentationfile.event.txt | sort -u | sort -k1V -k2V -k3n | sed 1i"Probe\tChrom\tBasePair" >markers.event.txt
 
-java -Xmx200G -classpath ~/JISTIC/JISTIC.jar JISTIC.convertSEG segmentationfile.event.txt markers.event.txt excludedregions=/home/jintao/JISTIC/glioexample/CNV.XY.txt IncludeRemovedMarkers verbose > MatrixFile
+java -Xmx200G -classpath ~/JISTIC/JISTIC.jar JISTIC.convertSEG segmentationfile.event.txt markers.event.txt excludedregions=~/JISTIC/glioexample/CNV.XY.txt IncludeRemovedMarkers verbose > MatrixFile
 
-java -Xmx1500m -classpath ~/JISTIC/JISTIC.jar JISTIC.filterMarkers excludedregions=/home/jintao/JISTIC/glioexample/CNV.XY.txt MatrixFile
+java -Xmx1500m -classpath ~/JISTIC/JISTIC.jar JISTIC.filterMarkers excludedregions=~/JISTIC/glioexample/CNV.XY.txt MatrixFile
  > FilteredMatrixFile
 
 java -Xmx250G -classpath ~/JISTIC/JISTIC.jar JISTIC.Distribution spec=focal/GISTICFocal.spec copynumber=matrixFile locations=hg19_Gene_Info.txt bands=cytoBand.txt
@@ -231,7 +231,7 @@ java -Xmx1500m -classpath ~/JISTIC/JISTIC.jar JISTIC.Convert2IGV output
 ### JISTIC TO hotnet2
 
 ```
-runHotNet2.py --hotnet2 /share/apps/hotnet2-1.0.0 --snv_file /home/jintao/TCGA/LUAD/hotnet2_SNV_SCNA/snv.p0.01.txt -o /home/jintao/TCGA/LUAD/hotnet2_SNV_SCNA -p 45 --cna_file /home/jintao/TCGA/LUAD/hotnet2_SNV_SCNA/gene.matrix
+runHotNet2.py --hotnet2 /share/apps/hotnet2-1.0.0 --snv_file ~/TCGA/LUAD/hotnet2_SNV_SCNA/snv.p0.01.txt -o ~/TCGA/LUAD/hotnet2_SNV_SCNA -p 45 --cna_file ~/TCGA/LUAD/hotnet2_SNV_SCNA/gene.matrix
 
-python hotnet2.3.py --hotnet2 /share/apps/hotnet2-1.0.0 --snv_file /home/jintao/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5/snv.p0.05.txt -o /home/jintao/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5 -p 48 --cna_file /home/jintao/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5/cna.100.txt
+python hotnet2.3.py --hotnet2 /share/apps/hotnet2-1.0.0 --snv_file ~/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5/snv.p0.05.txt -o ~/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5 -p 48 --cna_file ~/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5/cna.100.txt
 ```

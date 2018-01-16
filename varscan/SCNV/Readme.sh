@@ -1,12 +1,12 @@
 ########### call CNV ##############################
 for i in `seq 1 22` X Y;
 do
-    python varscan.copynumber.2.2.py -r /share/data4/Genome/hg19/hg19.chr.fa -l chr$i -i /home/jintao/varsan_CNV/ZH.txt --min-coverage 20 -o /home/jintao/varsan_CNV/CNV2/ZH --mpileup_option B,q1 /share/apps/VarScan/VarScan.v2.3.9.jar --qsub
+    python varscan.copynumber.2.2.py -r /share/data4/Genome/hg19/hg19.chr.fa -l chr$i -i ~/varsan_CNV/ZH.txt --min-coverage 20 -o ~/varsan_CNV/CNV2/ZH --mpileup_option B,q1 /share/apps/VarScan/VarScan.v2.3.9.jar --qsub
 done
 
-python varscan.copynumber.2.2.py -r /share/data4/Genome/hg19/hg19.chr.fa -l chr17 -i /home/jintao/varsan_CNV/ESCC-D1.txt --min-coverage 20 -o /home/jintao/varsan_CNV/CNV2 --mpileup_option B,q1 /share/apps/VarScan/VarScan.v2.3.9.jar --qsub
+python varscan.copynumber.2.2.py -r /share/data4/Genome/hg19/hg19.chr.fa -l chr17 -i ~/varsan_CNV/ESCC-D1.txt --min-coverage 20 -o ~/varsan_CNV/CNV2 --mpileup_option B,q1 /share/apps/VarScan/VarScan.v2.3.9.jar --qsub
 
-/home/jintao/samtools-0.1.18/bin/samtools mpileup -B -q1 -r chr17 -f /share/data4/Genome/hg19/hg19.chr.fa /share/data2/ESCC/SRP_PTMD/ESCC-D1N.dedup.bam /share/data2/ESCC/SRP_PTMD/ESCC-D1T.dedup.bam | java -jar /share/apps/VarScan/VarScan.v2.3.9.jar copynumber - /home/jintao/varsan_CNV/CNV2/ESCC-D1.chr17 --mpileup 1 --min-coverage 20 --min-segment-size 100
+~/samtools-0.1.18/bin/samtools mpileup -B -q1 -r chr17 -f /share/data4/Genome/hg19/hg19.chr.fa /share/data2/ESCC/SRP_PTMD/ESCC-D1N.dedup.bam /share/data2/ESCC/SRP_PTMD/ESCC-D1T.dedup.bam | java -jar /share/apps/VarScan/VarScan.v2.3.9.jar copynumber - ~/varsan_CNV/CNV2/ESCC-D1.chr17 --mpileup 1 --min-coverage 20 --min-segment-size 100
 
 # python ~/qsub.py
 #### merge copynumber#################
@@ -188,7 +188,7 @@ awk 'NR>1{print $2":"$3"\t"$2"\t"$3"\n"$2":"$4"\t"$2"\t"$4}' segmentationfile.ev
 
 
 
-java -Xmx200G -classpath ~/JISTIC/JISTIC.jar JISTIC.convertSEG segmentationfile.event.txt markers.event.txt excludedregions=/home/jintao/JISTIC/glioexample/CNV.XY.txt IncludeRemovedMarkers verbose > MatrixFile
+java -Xmx200G -classpath ~/JISTIC/JISTIC.jar JISTIC.convertSEG segmentationfile.event.txt markers.event.txt excludedregions=~/JISTIC/glioexample/CNV.XY.txt IncludeRemovedMarkers verbose > MatrixFile
 
 java -Xmx1500m -classpath ~/JISTIC/JISTIC.jar JISTIC.filterMarkers MatrixFile
  > FilteredMatrixFile
@@ -204,5 +204,5 @@ java -Xmx1500m -classpath ~/JISTIC/JISTIC.jar JISTIC.Convert2IGV output
 
 
 
-python hotnet2.3.py --hotnet2 /share/apps/hotnet2-1.0.0 --snv_file /home/jintao/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5/snv.p0.05.txt -o /home/jintao/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5 -p 48 --cna_file /home/jintao/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5/cna.100.txt
+python hotnet2.3.py --hotnet2 /share/apps/hotnet2-1.0.0 --snv_file ~/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5/snv.p0.05.txt -o ~/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5 -p 48 --cna_file ~/hotnet2/new/mutation/p0.05_302_snv_indel_cna_100_noY_0.5/cna.100.txt
 
