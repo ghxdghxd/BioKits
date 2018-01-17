@@ -45,7 +45,7 @@ def oncotator(input_file, input_format, output_format, dbdir, node=None):
     ftmp = tempfile.NamedTemporaryFile()
     ftmp.write(b"#!/bin/bash\n")
     if node:
-        ftmp.write(b"#PBS -l nodes=1:" + encode("utf-8") + b"\n")
+        ftmp.write(b"#PBS -l nodes=1:" + node.encode("utf-8") + b"\n")
     ftmp.write(b"#PBS -j oe\n")
     export = b"source /etc/profile.d/set.sh\n"
     act = b"source activate oncotator\n"
