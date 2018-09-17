@@ -107,15 +107,15 @@ def main():
     args = get_args3()
     with open(args.input_file) as f:
         bed = map(lambda x: x.strip().split(), f.readlines())
-    bed = filter(lambda x: x[3].find(",") < 0, bed)
+    bed = list(filter(lambda x: x[3].find(",") < 0, bed))
     bed_snp = filter(lambda x: len(x[2]) == len(x[3]) == 1, bed)
     bed_snp = map(snp, bed_snp)
     bed_ins = filter(lambda x: len(x[2]) < len(x[3]), bed)
     bed_ins = map(insert, bed_ins)
     bed_del = filter(lambda x: len(x[2]) > len(x[3]), bed)
     bed_del = map(deletion, bed_del)
-    bed_snp.extend(bed_ins)
-    bed_snp.extend(bed_del)
+    list(bed_snp).extend(bed_ins)
+    list(bed_snp).extend(bed_del)
     with open(args.output_file, "w") as f:
         f.write("ID\tchr\tstart\tend\tref_allele\talt_allele\n")
         f.write("\n".join(bed_snp))
