@@ -21,8 +21,6 @@ conda remove --name qiime1 --all 删除qiime1环境
 
 # fastq-join
 
-##
-
   File "/share/apps/anaconda/bin/print_qiime_config.py", line 40, in
 &lt;module&gt;
 
@@ -31,3 +29,11 @@ conda remove --name qiime1 --all 删除qiime1环境
 ImportError: No module named externals
 
     conda install -c https://conda.anaconda.org/biocore scikit-bio
+
+## error
+
+Additional information: on this system no suitable UTF-8
+locales were discovered.  This most likely requires resolving
+by reconfiguring the locale system.
+
+解决 export LC_ALL=en_US.utf8

@@ -111,10 +111,11 @@ def run_david(inputIds, idType, email, listName, input_dict):
         rowList = [gene_id, name, species]
         category_dict = dict.fromkeys(categories, "")
         for annotationRecord in tableRecord.annotationRecords:
-            category_dict[str(annotationRecord.category)] = ",".join(
-                [x.split("$")[1] for x in annotationRecord.terms])
-        res.append(
-            "\t".join(rowList + [category_dict[key] for key in categories]))
+            # category_dict[str(annotationRecord.category)] = ",".join([x.split("$")[1] for x in annotationRecord.terms])
+            category_dict[str(annotationRecord.category)] = ",".join([x.split("$")[1].replace("\ufffd","") for x in annotationRecord.terms])
+
+        res.append("\t".join(rowList + [category_dict[key] for key in categories]))
+            # .encode('utf-8').replace("\xef\xbf\xbd","").decode())
 
     resF = listName + ".tableReport.txt"
     with open(resF, 'w') as fOut:

@@ -59,8 +59,8 @@ def get_args():
 
 
 def sra2fq(f):
-    cmd = args.fastq_dump + " --split-3 --gzip " + \
-        f + " -O " + args.output_dir
+    cmd = args.fastq_dump + u" --split-3 --gzip " + \
+        f + u" -O " + args.output_dir + u" --defline-qual '+' --defline-seq '@$ac-$si/$ri'"
     print(cmd)
     os.system(cmd)
 
@@ -68,25 +68,25 @@ def sra2fq(f):
 def qsub_sra2fq(f):
     """Run sra2fq in nodes."""
     ftmp = tempfile.NamedTemporaryFile()
-    ftmp.write("#!/bin/bash\n")
+    ftmp.write(u"#!/bin/bash\n")
     # ftmp.write("#PBS -N " + jobname[-8:] + "-sra2fq\n")
     ftmp.write(
-        "#PBS -o " + os.path.split(os.path.realpath(__file__))[0] + "/log\n")
+        u"#PBS -o " + os.path.split(os.path.realpath(__file__))[0] + u"/log\n")
 
     if args.node_name:
         ftmp.write(
-            "#PBS -l nodes=1:" + args.node_name + ":ppn=1,walltime=100:00:00\n")
+            u"#PBS -l nodes=1:" + args.node_name + u":ppn=1,walltime=100:00:00\n")
     else:
         ftmp.write(
-            "#PBS -l nodes=1:ppn=1,walltime=100:00:00\n")
+            u"#PBS -l nodes=1:ppn=1,walltime=100:00:00\n")
 
-    ftmp.write("#PBS -j oe\ncd $PBS_O_WORKDIR\n")
-    cmd = args.fastq_dump + " --split-3 --gzip " + \
-        f + " -O " + args.output_dir
+    ftmp.write(u"#PBS -j oe\ncd $PBS_O_WORKDIR\n")
+    cmd = args.fastq_dump + u" --split-3 --gzip " + \
+        f + u" -O " + args.output_dir
     ftmp.write(cmd)
     ftmp.seek(0)
-    # print ftmp.read()
-    os.system("qsub " + ftmp.name)
+    print(ftmp.read())
+    # os.system(u"qsub " + ftmp.name)
     ftmp.close()
 
 
@@ -96,9 +96,9 @@ def makedir(new_dir, exist_dir=None):
     if exist_dir:
         new_dir = os.path.join(exist_dir, new_dir)
     if os.path.exists(new_dir):
-        print("The " + new_dir + " is already exist")
+        print(u"The " + new_dir + u" is already exist")
     else:
-        print("Make " + new_dir)
+        print(u"Make " + new_dir)
         os.makedirs(new_dir)
 
 
