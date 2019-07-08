@@ -1,12 +1,16 @@
 ########### call CNV ##############################
 for i in `seq 1 22` X Y;
 do
-    python varscan.copynumber.2.2.py -r /share/data4/Genome/hg19/hg19.chr.fa -l chr$i -i ~/varsan_CNV/ZH.txt --min-coverage 20 -o ~/varsan_CNV/CNV2/ZH --mpileup_option B,q1 /share/apps/VarScan/VarScan.v2.3.9.jar --qsub
+    python varscan.copynumber.2.2.py -r /share/data4/Genome/hg19/hg19.chr.fa -l chr$i -i ~/varsan_CNV/ZH.txt --min-coverage 20 \
+    -o ~/varsan_CNV/CNV2/ZH --mpileup_option B,q1 /share/apps/VarScan/VarScan.v2.3.9.jar --qsub
 done
 
-python varscan.copynumber.2.2.py -r /share/data4/Genome/hg19/hg19.chr.fa -l chr17 -i ~/varsan_CNV/ESCC-D1.txt --min-coverage 20 -o ~/varsan_CNV/CNV2 --mpileup_option B,q1 /share/apps/VarScan/VarScan.v2.3.9.jar --qsub
+python varscan.copynumber.2.2.py -r /share/data4/Genome/hg19/hg19.chr.fa -l chr17 -i ~/varsan_CNV/ESCC-D1.txt --min-coverage 20 \
+-o ~/varsan_CNV/CNV2 --mpileup_option B,q1 /share/apps/VarScan/VarScan.v2.3.9.jar --qsub
 
-~/samtools-0.1.18/bin/samtools mpileup -B -q1 -r chr17 -f /share/data4/Genome/hg19/hg19.chr.fa /share/data2/ESCC/SRP_PTMD/ESCC-D1N.dedup.bam /share/data2/ESCC/SRP_PTMD/ESCC-D1T.dedup.bam | java -jar /share/apps/VarScan/VarScan.v2.3.9.jar copynumber - ~/varsan_CNV/CNV2/ESCC-D1.chr17 --mpileup 1 --min-coverage 20 --min-segment-size 100
+~/samtools-0.1.18/bin/samtools mpileup -B -q1 -r chr17 -f /share/data4/Genome/hg19/hg19.chr.fa \
+/share/data2/ESCC/SRP_PTMD/ESCC-D1N.dedup.bam /share/data2/ESCC/SRP_PTMD/ESCC-D1T.dedup.bam | \
+java -jar /share/apps/VarScan/VarScan.v2.3.9.jar copynumber - ~/varsan_CNV/CNV2/ESCC-D1.chr17 --mpileup 1 --min-coverage 20 --min-segment-size 100
 
 # python ~/qsub.py
 #### merge copynumber#################
@@ -47,8 +51,9 @@ done
 ####### 合并 segments.p_value, 注释 CNV
 for i in *segments.p_value;
 do
-    perl ~/varsan_CNV/mergeSegments.pl $i --ref-arm-sizes ~/varsan_CNV/arm_sizes.txt --amp-threshold 0.9 --del-threshold -0.9 --output-basename ${i%%.*}
-    sed 1d ${i%%.*}.events.tsv|grep -wv neutral|tee| intersectBed -a - -b ~/varsan_CNV/hg19.RefSeq.bed -wa -wb | sed 1i"`head -1 ${i%%.*}.events.tsv`\tchrom\ttxStart\ttxEnd\tgene" - | grep -v chrY >${i%%.*}.events.anno
+    perl ~/varsan_CNV/mergeSegments.pl $i --ref-arm-sizes ~/varsan_CNV/arm_sizes.txt --amp-threshold 0.5 --del-threshold -0.5 --output-basename ${i%%.*}
+    sed 1d ${i%%.*}.events.tsv|grep -wv neutral|tee| intersectBed -a - -b ~/varsan_CNV/hg19.RefSeq.bed -wa -wb | \
+        sed 1i"`head -1 ${i%%.*}.events.tsv`\tchrom\ttxStart\ttxEnd\tgene" - | grep -v chrY >${i%%.*}.events.anno
 done
 
 #####合并所有样本
@@ -193,9 +198,11 @@ java -Xmx200G -classpath ~/JISTIC/JISTIC.jar JISTIC.convertSEG segmentationfile.
 java -Xmx1500m -classpath ~/JISTIC/JISTIC.jar JISTIC.filterMarkers MatrixFile
  > FilteredMatrixFile
 
-ffkitnjava -Xmx250G -classpath ~/JISTIC/JISTIC.jar JISTIC.Distribution spec=focal/GISTICFocal.spec copynumber=matrixFile locations=hg19_Gene_Info.txt bands=cytoBand.txt
+java -Xmx250G -classpath ~/JISTIC/JISTIC.jar JISTIC.Distribution spec=focal/GISTICFocal.spec \
+copynumber=matrixFile locations=hg19_Gene_Info.txt bands=cytoBand.txt
 
-java -Xmx250G -classpath ~/JISTIC/JISTIC.jar JISTIC.Distribution spec=limited/GISTICLimited.spec copynumber=MatrixFile locations=hg19_Gene_Info.txt bands=cytoBand.txt
+java -Xmx250G -classpath ~/JISTIC/JISTIC.jar JISTIC.Distribution spec=limited/GISTICLimited.spec \
+copynumber=MatrixFile locations=hg19_Gene_Info.txt bands=cytoBand.txt
 
 java -Xmx1500m -classpath ~/JISTIC/JISTIC.jar JISTIC.Convert2IGV output
 

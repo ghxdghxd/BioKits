@@ -18,7 +18,9 @@ def main():
     """Main function."""
     global args
     args = get_args3()
-    check_dependencies(["bwa", "samtools", "a"])
+    check_dependencies(["bwa", "samtools"])
+    makedir(args.output_dir)
+    print(args.output_dir)
     pool = multiprocessing.Pool(processes=int(args.processes_number))
 
     with open(args.fastqs) as fq:
@@ -133,60 +135,63 @@ def check_dependencies(tools):
         sys.exit()
 
 
-def run_bwa(fastqs):
+def run_bwa(fastqs, run = True):
     """Run bwa."""
     fastq_r1 = fastqs.split()[0]
     fastq_r2 = fastqs.split()[1]
     fastq_name = get_same_name(fastq_r1, fastq_r2)
-    bwa_mem = "bwa mem -t " + str(args.threads_number) + \
-        " -M -R \"@RG\\tID:" + fastq_name + \
-        "\\tLB:Hg19\\tPL:Illumina\\tPU:Barcode\\tSM:" + fastq_name + \
-        "\" " + args.ref_fa + " " + fastq_r1 + " " + fastq_r2 + \
-        " | samtools view -u -t " + args.ref_fa + \
-        ".fai -S - -b | samtools sort - " + \
-        args.output_dir + "/" + fastq_name + ".sorted"
-    bam_index = "samtools index " + args.output_dir + \
-        "/" + fastq_name + ".sorted.bam"
-    print("Running: ", bwa_mem)
-    os.system(bwa_mem)
-    print("Running: ", bam_index)
-    os.system(bam_index)
+    bwa_mem = b"bwa mem -t " + args.threads_number.encode() + \
+        b" -M -R \"@RG\\tID:" + fastq_name.encode() + \
+        b"\\tLB:HG\\tPL:Illumina\\tPU:Barcode\\tSM:" + fastq_name.encode() + \
+        b"\\tCREATE_INDEX:True\" " + \
+        args.ref_fa.encode() + b" " + fastq_r1.encode() + b" " + fastq_r2.encode() + \
+        b" | samtools view -u -t " + args.ref_fa.encode() + \
+        b".fai -S - -b | samtools sort -@" + args.threads_number.encode() + b" - -o " + \
+        args.output_dir.encode() + b"/" + fastq_name.encode() + b".sorted.bam\n"
+    bam_index = b"samtools index " + args.output_dir.encode() + \
+        b"/" + fastq_name.encode() + b".sorted.bam"
+    if run:
+        print("Running: ", bwa_mem)
+        os.system(bwa_mem)
+        print("Running: ", bam_index)
+        os.system(bam_index)
+    else:
+        return fastq_name, bwa_mem, bam_index
 
 
 def qsub_run_bwa(fastqs):
     """Run bwa in clusters."""
-    fastq_r1 = fastqs.split()[0]
-    fastq_r2 = fastqs.split()[1]
-    fastq_name = get_same_name(fastq_r1, fastq_r2)
+    fastq_name, bwa_mem, bam_index = run_bwa(fastqs, run=False)
+    # fastq_r1 = fastqs.split()[0]
+    # fastq_r2 = fastqs.split()[1]
+    # fastq_name = get_same_name(fastq_r1, fastq_r2)
     ftmp = tempfile.NamedTemporaryFile()
-    ftmp.write("#!/bin/bash\n")
-    ftmp.write(
-        "#PBS -o " + os.path.split(os.path.realpath(__file__))[0] + "/log\n")
+    ftmp.write(b"#!/bin/bash\n")
+    ftmp.write(b"#PBS -N bwa-" + fastq_name.encode() + b"\n")
+    ftmp.write(b"#PBS -o " + args.output_dir.encode() + b"/" + fastq_name.encode() + b"\n")
     if args.node:
-        ftmp.write("#PBS -l nodes=1:" + args.node + ":ppn=" +
-                   args.threads_number + ",walltime=100:00:00\n")
+        ftmp.write(b"#PBS -l nodes=1:" + args.node.encode() +
+                   b":ppn=" + args.threads_number.encode() + b",walltime=100:00:00\n")
     else:
-        ftmp.write(
-            "#PBS -l nodes=1:ppn=" + args.threads_number +
-            ",walltime=100:00:00\n")
-    ftmp.write("#PBS -j oe\ncd $PBS_O_WORKDIR\n")
+        ftmp.write(b"#PBS -l nodes=1:ppn=" + args.threads_number.encode() + b",walltime=100:00:00\n")
+    ftmp.write(b"#PBS -j oe\ncd $PBS_O_WORKDIR\n")
 
-    bwa_mem = "bwa mem -t " + str(args.threads_number) + \
-        " -M -R \"@RG\\tID:" + fastq_name + \
-        "\\tLB:Hg19\\tPL:Illumina\\tPU:Barcode\\tSM:" + fastq_name + \
-        "\\tCREATE_INDEX:True\" " + \
-        args.ref_fa + " " + fastq_r1 + " " + fastq_r2 + \
-        " | samtools view -u -t " + args.ref_fa + \
-        ".fai -S - -b | samtools sort - " + \
-        args.output_dir + "/" + fastq_name + ".sorted\n"
-    bam_index = "samtools index " + args.output_dir + \
-        "/" + fastq_name + ".sorted.bam"
-
+    # bwa_mem = b"bwa mem -t " + args.threads_number.encode() + \
+    #     b" -M -R \"@RG\\tID:" + fastq_name.encode() + \
+    #     b"\\tLB:HG\\tPL:Illumina\\tPU:Barcode\\tSM:" + fastq_name.encode() + \
+    #     b"\\tCREATE_INDEX:True\" " + \
+    #     args.ref_fa.encode() + b" " + fastq_r1.encode() + b" " + fastq_r2.encode() + \
+    #     b" | samtools view -u -t " + args.ref_fa.encode() + \
+    #     b".fai -S - -b | samtools sort - " + \
+    #     args.output_dir.encode() + b"/" + fastq_name.encode() + b".sorted\n"
+    # bam_index = b"samtools index " + args.output_dir.encode() + \
+    #     b"/" + fastq_name.encode() + b".sorted.bam"
+    ftmp.write(b"source /etc/profile.d/set.sh\n")
     ftmp.write(bwa_mem)
     ftmp.write(bam_index)
     ftmp.seek(0)
-    print(ftmp.read())
-    # os.system("qsub " + ftmp.name)
+    # print(ftmp.read())
+    os.system("qsub " + ftmp.name)
     ftmp.close()
 
 
@@ -195,7 +200,7 @@ def get_same_name(str1, str2):
     for i in range(1, len(str1)):
         if str1[:-i] == str2[:-i] and str1[:-i][-1].isalnum():
             return os.path.basename(str1[:-i])
-            break
+            # break
 
 
 def makedir(new_dir, exist_dir=None):

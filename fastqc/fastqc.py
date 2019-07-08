@@ -32,10 +32,9 @@ def get_args3():
 
     parser.add_argument("-i",
                         metavar="FILE",
-                        dest="bam_paired",
+                        dest="input",
                         required=True,
-                        help="list of input bam_files "
-                        "(e.g: normal_bam tumor_bam)")
+                        help="fastq file")
     parser.add_argument("-o",
                         metavar="DIR",
                         dest="output_dir",
@@ -62,19 +61,18 @@ def get_args3():
         return args
 
 
-def fastqc(args, cmd):
+def fastqc(args):
     """Qsub."""
     name = os.path.basename(args.input)
     ftmp = tempfile.NamedTemporaryFile()
-    ftmp.write("#!/bin/bash\n")
-    ftmp.write("#PBS -N fqC" + name.split('.')[0] + "\n")
+    ftmp.write(b"#!/bin/bash\n")
+    ftmp.write(b"#PBS -N QC" + name.split('.')[0].encode() + b"\n")
     ftmp.write(
-        "#PBS -o " + os.path.split(os.path.realpath(__file__))[0] + "/log\n")
-    ftmp.write("#PBS -j oe\ncd $PBS_O_WORKDIR\n")
-    ftmp.write("fastqc " + args.input + " -o " +
-               os.path.join(args.output_dir, "name.split('.')[0]"))
+        b"#PBS -o " + args.output_dir.encode() + b"/log\n")
+    ftmp.write(b"#PBS -j oe\ncd $PBS_O_WORKDIR\nsource /etc/profile.d/set.sh\n")
+    ftmp.write(b"fastqc " + args.input.encode() + b" -o " + args.output_dir.encode())
     ftmp.seek(0)
-    # os.system("qsub " + ftmp.name)
+    os.system("qsub " + ftmp.name)
     print(ftmp.read())
     ftmp.close()
 
