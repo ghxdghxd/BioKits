@@ -41,7 +41,8 @@ def get_args():
         print("\033[1;31m" + str(imerr) + " \033[0m")
         sys.exit()
 
-    parser = argparse.ArgumentParser(usage="%(prog)s", fromfile_prefix_chars='@', description=__doc__)
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s", fromfile_prefix_chars='@', description=__doc__)
 
     parser.add_argument("--path2picard",
                         metavar="DIR",
@@ -136,50 +137,43 @@ def makedir(new_dir, exist_dir=None):
         os.makedirs(new_dir)
 
 
-def mark_duplicates(bam):
+def mark_duplicates(bam, run=True):
     bam_name = os.path.basename(bam).split(".sorted.bam")[0]
-    cmd = "java -XX:ParallelGCThreads=" + args.threads_number + \
-        " -Xmx" + args.Xmx + \
-        " -jar " + args.picard + "/MarkDuplicates.jar" +\
-        " REMOVE_DUPLICATES=" + str(args.rmdup) +\
-        " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=8000" +\
-        " VALIDATION_STRINGENCY=" + args.validation_stringency +\
-        " INPUT=" + bam + \
-        " OUTPUT=" + args.output_dir + "/" + bam_name + ".dedup.bam" +\
-        " METRICS_FILE=" + args.output_dir + "/" + bam_name + ".metrics" +\
-        " CREATE_INDEX=true ASSUME_SORTED=true"
-    print(cmd)
-    os.system(cmd)
+    cmd = b"java -XX:ParallelGCThreads=" + args.threads_number.encode() + \
+        b" -Xmx" + args.Xmx.encode() + \
+        b" -jar " + args.picard.encode() + b" MarkDuplicates" +\
+        b" REMOVE_DUPLICATES=" + str(args.rmdup).encode() +\
+        b" MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=8000" +\
+        b" VALIDATION_STRINGENCY=" + args.validation_stringency.encode() +\
+        b" INPUT=" + bam.encode() + \
+        b" OUTPUT=" + args.output_dir.encode() + b"/" + bam_name.encode() + b".sorted.dedup.bam" +\
+        b" METRICS_FILE=" + args.output_dir.encode() + b"/" + bam_name.encode() + b".metrics" +\
+        b" CREATE_INDEX=true ASSUME_SORTED=true"
+    if run:
+        print(cmd)
+        os.system(cmd)
+    else:
+        return bam_name, cmd
 
 
 def qsub_mark_duplicates(bam):
-    bam_name = os.path.basename(bam).split(".sorted.bam")[0]
+    bam_name, cmd = mark_duplicates(bam, run=False)
     ftmp = tempfile.NamedTemporaryFile()
-    ftmp.write("#!/bin/bash\n")
-    ftmp.write("#PBS -N " + bam_name[-10:] + "-PTMD\n")
-    ftmp.write("#PBS -o " + os.path.split(os.path.realpath(__file__))[0] + "/log\n")
+    ftmp.write(b"#!/bin/bash\n")
+    ftmp.write(b"#PBS -N markdup-" + bam_name.encode() + b"\n")
+    ftmp.write(b"#PBS -o " + args.output_dir.encode() +
+               b"/" + bam_name.encode() + b".markdup\n")
     if args.node:
-        ftmp.write("#PBS -l nodes=1:" + args.node +
-                   ":ppn=" + args.threads_number +
-                   ",mem=" + args.Xmx + ",walltime=100:00:00\n")
+        ftmp.write(b"#PBS -l nodes=1:" + args.node.encode() +
+                   b":ppn=" + args.threads_number.encode() +
+                   b",mem=" + args.Xmx.encode() + b",walltime=100:00:00\n")
     else:
-        ftmp.write("#PBS -l nodes=1:ppn=" + args.threads_number +
-                   ",mem=" + args.Xmx + ",walltime=100:00:00\n")
-    ftmp.write("#PBS -j oe\ncd $PBS_O_WORKDIR\n")
-
-    cmd = "java -XX:ParallelGCThreads=" + args.threads_number + \
-        " -Xmx" + args.Xmx + \
-        " -jar " + args.picard + "/MarkDuplicates.jar" +\
-        " REMOVE_DUPLICATES=" + str(args.rmdup) +\
-        " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=8000" +\
-        " VALIDATION_STRINGENCY=" + args.validation_stringency +\
-        " INPUT=" + bam + \
-        " OUTPUT=" + args.output_dir + "/" + bam_name + ".dedup.bam" +\
-        " METRICS_FILE=" + args.output_dir + "/" + bam_name + ".metrics" +\
-        " CREATE_INDEX=true ASSUME_SORTED=true"
+        ftmp.write(b"#PBS -l nodes=1:ppn=" + args.threads_number.encode() +
+                   b",mem=" + args.Xmx.encode() + b",walltime=100:00:00\n")
+    ftmp.write(b"#PBS -j oe\ncd $PBS_O_WORKDIR\nsource /etc/profile.d/set.sh\n")
     ftmp.write(cmd)
     ftmp.seek(0)
-    # print ftmp.read()
+    # print(ftmp.read())
     os.system("qsub " + ftmp.name)
     ftmp.close()
 
