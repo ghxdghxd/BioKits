@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# @Date    : 2021-11-05 21:47:05
+# @Date    : 2021-11-15 13:11:05
 # @Author  : Jintao Guo
 # @Email   : guojt-4451@163.com
 
@@ -140,6 +140,7 @@ def run_bwa(fastqs):
     fastq_r2 = fastqs.split()[2]
     bwa_mem = "bwa mem -t " + str(args.threads_number) + \
         " -M -R \"@RG\\tID:" + fastq_name + \
+        "\\tLB:" + os.path.basename(args.ref_fa).split(".")[0] + "\\tSM:" + fastq_name + \
         args.ref_fa + " " + fastq_r1 + " " + fastq_r2 + \
         " | samtools view -u -t " + args.ref_fa + \
         ".fai -S - -b | samtools sort -m 4G -o " + \
@@ -175,7 +176,6 @@ def qsub_run_bwa(fastqs):
     bwa_mem = "bwa mem -t " + str(args.threads_number) + \
         " -M -R \"@RG\\tID:" + fastq_name + \
         "\\tLB:Hg19\\tPL:Illumina\\tPU:Barcode\\tSM:" + fastq_name + \
-        "\\tCREATE_INDEX:True\" " + \
         args.ref_fa + " " + fastq_r1 + " " + fastq_r2 + \
         " | samtools view -u -t " + args.ref_fa + \
         ".fai -S - -b | samtools sort -m 4G -o " + \
